@@ -1,10 +1,24 @@
-//Prerequisite
-var Express = require("express");
-var Movie = require("./movie");
-var User = require("./user");
-var Rating = require("./rating");
+/**
+ * Modules
+ */
+var express = require("express");
 
+/**
+ * Classes
+ */
+var Movie = require("./model/movie");
+var User = require("./model/user");
+var Rating = require("./model/rating");
+
+/**
+ * Properties
+ */
 var movies = [];
 var users = [];
 
-movies.push(new Movie());
+var app = express();
+console.log('Starting...');
+
+app.get("/", function (request, response) {
+    response.send("Hello World");
+});
