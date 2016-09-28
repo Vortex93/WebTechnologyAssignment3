@@ -1,17 +1,12 @@
+//Prerequisite
 var Express = require("express");
+var Movie = require("./movie");
+var User = require("./user");
+var Rating = require("./rating");
 
-var express = new Express();
+var movies = [];
+var users = [];
 
-var User = function (lastName, middleName, firstName, userName, password) {
-    this.lastName = lastName;
-    this.middleName = middleName;
-    this.firstname = firstName;
-    this.userName = userName;
-    this.password = password;
-}
+movies.push(new Movie());
 
-var Rating = function (movie, user, stars) {
-    this.movie = movie;
-    this.user = user;
-    this.stars = stars;
-}
+console.log(movies);
