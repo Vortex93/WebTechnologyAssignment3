@@ -8,5 +8,3 @@ var movies = [];
 var users = [];
 
 movies.push(new Movie());
-
-console.log(movies);
