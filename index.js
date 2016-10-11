@@ -1,39 +1,47 @@
 /**
- * Modules
+ * Prerequisite Packages
  */
-var express = require('express');
-var MongoClient = require('mongodb').MongoClient,
-    assert = require('assert');
+var Express = require('express');
+var https = require('https');
+var BodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var config = require('./config');
+
+var tokenChecker = require('./routes/tokenChecker');
+
+var authorize = require('./routes/authorize');
+var users = require('./routes/users');
+var movies = require('./routes/movies');
+var ratings = require('./routes/ratings');
 
 /**
- * Classes
+ * Configure Database
  */
-var Config = require('./global');
-var Movie = require('./model/movie');
-var User = require('./model/user');
-var Rating = require('./model/rating');
+mongoose.connect('mongodb://10.0.0.11', {server: {connectTimeoutMS: 2000}});
+mongoose.Promise = global.Promise; //Prevent deprecated errors
 
-/**
- * Properties
- */
-var movies = [];
-var users = [];
-
-var app = express();
-movies.push(new Movie('tt2404435',
-    'The Magnificent Seven',
-    '23 September 2016',
-    133,
-    'Antoine Fuqua',
-    'Seven gun men in the old west gradually come together to help a poor village against savage thieves.'));
-
-app.get('/', function (request, response) {
-    response.send(movies);
+//Check whether an connection error occurred
+mongoose.connection.on('error', function (error) {
+    console.error(error);
 });
 
-/**
- * Starts listening on the port specified by the configuration.
- */
-app.listen(3000, function () {
-    console.log('NotFlix is running on port ' + Config.port);
+//Check whether connection succeeded
+mongoose.connection.on('connected', function () {
+    console.log('Successfully connected');
 });
+
+var app = Express();
+app.set('privateKey', 'Aruba'); //Set the private key, that would be used for jwt
+
+app.use(BodyParser.json()); //Support JSON encoded bodies
+app.use(BodyParser.urlencoded({extended: true})); //Support encoded bodies
+
+//Verifies token on all the api
+app.use('/api', tokenChecker);
+
+app.use('/api/authorize', authorize);
+app.use('/api/users', users);
+app.use('/api/movies', movies);
+app.use('/api/ratings', ratings);
+
+app.listen(config.port, null); //Start listening
