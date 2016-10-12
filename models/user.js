@@ -26,7 +26,7 @@ var UserSchema = new Schema({
  * @param lastName Last name of the user.
  * @param username Name that is used to authenticate the user.
  */
-UserSchema.statics.search = function (userId, firstName, middleName, lastName, username, callback) {
+UserSchema.statics.query = function (userId, firstName, middleName, lastName, username, callback) {
     var query = {};
     if (userId) query._userId = userId;
     if (firstName) query.firstName = new RegExp('^' + firstName, 'i');
@@ -45,15 +45,8 @@ UserSchema.statics.search = function (userId, firstName, middleName, lastName, u
  * @param callback The callback function to be called after the execution.
  */
 UserSchema.statics.findById = function (userId, callback) {
-    try {
-        this.findOne(
-            {_userId: userId},
-            visibleFields, //Makes sure that the user has certain visible fields (Excl. password)
-            callback); //Calls the callback
-    } catch (error) {
-        callback(error);
-    }
-
+    return this.findOne({_userId: userId}, visibleFields)
+        .exec(callback)
 };
 
 /**
@@ -63,9 +56,7 @@ UserSchema.statics.findById = function (userId, callback) {
  */
 UserSchema.statics.findByUsername = function (username) {
     return this.findOne({username: username})
-        .then(function (user) {
-            return user;
-        });
+        .exec();
 };
 
 /**
@@ -83,8 +74,8 @@ UserSchema.statics.findLast = function (callback) {
  */
 UserSchema.pre('save', function (callback) {
     //Check for duplicates
-    var self = this;
-    User.findOne({username: self.username}, visibleFields, function (error, user) {
+    var user = this;
+    User.findOne({username: user.username}, visibleFields, function (error, user) {
         callback(error, user);
     });
 });

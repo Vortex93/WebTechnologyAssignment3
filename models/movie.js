@@ -28,7 +28,7 @@ var MovieSchema = new Schema({
  * @param director The director
  * @param description A small description
  */
-MovieSchema.statics.search = function (tt, title, date, length, director, description) {
+MovieSchema.statics.query = function (tt, title, date, length, director, description) {
     var query = {};
     if (tt) query.tt = new RegExp('^' + tt, 'i');
     if (title) query.title = new RegExp('^' + title, 'i');
@@ -37,6 +37,7 @@ MovieSchema.statics.search = function (tt, title, date, length, director, descri
     if (director) query.director = new RegExp('^' + director, 'i');
     if (description) query.description = new RegExp('^' + description, 'i');
 
+    //Process the query
     return this.aggregate()
         .match(query)
         .project({ //Specify which fields should be displayed
@@ -46,7 +47,7 @@ MovieSchema.statics.search = function (tt, title, date, length, director, descri
             director: 1,
             description: 1,
             rating: {
-                $avg: '$ratings.rating'
+                $avg: '$ratings.rating' //Calculate the average rating
             }
         });
 };

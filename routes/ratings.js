@@ -18,12 +18,36 @@ var router = Express.Router();
 /**
  * Get ratings from the currently logged in user.
  */
-router.get('/', getRatings);
+router.get('/', function (request, response) {
+    var username = request.token.username;
+    var tt = request.query['tt'];
+    var rating = request.query['rating'];
+
+    Rating.find({rating: {movie: tt}})
+        .exec()
+
+        //Get all the ratings
+        .then(function (ratings) {
+            this.ratings = ratings;
+            return User.findByUsername(username);
+        })
+
+        //Get user
+        .then(function (user) {
+            if (user) {
+                this.user = user;
+            } else {
+                throw new Error
+            }
+        })
+
+        .catch();
+});
 
 /**
  * Get a rating specified by the id.
  */
-router.get('/:ratingId', function (request, response));
+router.get('/:ratingId', getRatingById);
 
 /**
  * Add new rating.
@@ -153,39 +177,62 @@ router.delete('/:ratingId', function (request, response) {
 });
 
 function getRatings(request, response) {
-    //Request
     var username = request.token.username;
     var tt = request.query['tt'];
     var rating = request.query['rating'];
 
-    //Query
-    var query = Rating.findByUsername(username);
+    Rating.findByUsername(username)
+        .exec()
 
-    //Process
-    query
-        .then(function (ratings) { //Handle ratings
-            response.json(ratings);
-        });
+        //Get all the ratings
+        .then(function (ratings) {
+            this.ratings = ratings;
+        })
+
+        //Filter the rating by movie tt
+        .then(function () {
+            this.ratings = this.ratings.filter(function (rating) {
+                return rating.movie.tt == tt;
+            });
+        })
+
+        //Handle response
+        .then(function () {
+            response.json(this.ratings);
+        })
+
+        //Handle error
+        .catch(function (error) {
+            //TODO handle error
+        })
 }
 
 function getRatingById(request, response) {
-    //Request
     var username = request.token.username;
     var ratingId = request.params['ratingId'];
 
-    //Query
-    var query = Rating.findById(ratingId);
+    Rating.findById(ratingId)
+        .exec()
 
-    //Process
-    query
+        //Get the rating
         .then(function (rating) {
-            if (!rating || rating.user.username != username)
-                throw Error('Rating not found');
+            this.rating = rating
+        })
 
-            response.json(rating);
-        }).catch(function (error) {
-        response.status(400).json(error.message);
-    });
+        //Filter the rating
+        .then(function () {
+            if (this.rating.user.username == username)
+                throw new MongooseError("Not found");
+        })
+
+        //Handle response
+        .then(function () {
+            response.json(this.rating);
+        })
+
+        .catch(function (error) {
+            //TODO handle error
+        });
 }
 
 module.exports = router;

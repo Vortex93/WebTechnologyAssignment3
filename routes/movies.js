@@ -24,13 +24,22 @@ router.get('/', function (request, response) {
     var director = request.query['director'];
     var description = request.query['description'];
 
-    //Search for the movie in the database
-    var query = Movie.search(tt, title, date, length, director, description);
-    query.then(function (movies) {
-        response.json(movies);
-    }).catch(function (error) {
-        response.status(400).json(error);
-    });
+    Movie.query(tt, title, date, length, director, description).exec()
+
+        //Get all movies from search properties
+        .then(function (movies) {
+            this.movies = movies;
+        })
+
+        //Send response
+        .then(function () {
+            response.json(this.movies);
+        })
+
+        //Handle error
+        .catch(function (error) {
+            //TODO handle error
+        });
 });
 
 module.exports = router;

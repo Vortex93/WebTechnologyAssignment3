@@ -10,7 +10,7 @@ var router = express.Router();
  * reason being that the user should be able to add a new user without
  * being registered.
  */
-router.use(function (request, response, next) {
+router.use(function (request, response, callback) {
     var token = request.headers.authorization; //Get the token from authorization
     var privateKey = request.app.get('privateKey'); //Get private key
 
@@ -19,7 +19,7 @@ router.use(function (request, response, next) {
     if (request.method == "POST" &&
         (request.path == '/users' ||
         request.path == '/authorize')) {
-        next();
+        callback();
     } else {
         //Verify the token
         jwt.verify(token, privateKey, function (error, decoded) {
@@ -33,7 +33,7 @@ router.use(function (request, response, next) {
                         throw new Error('User not found');
 
                     request.token = decoded;
-                    next();
+                    callback();
                 }).catch(function (error) {
                     response.status(400).json(error);
                 });

@@ -8,8 +8,8 @@ var ObjectId = mongoose.Types.ObjectId;
 //Create the rating schema
 var RatingSchema = new Schema({
     _ratingId: {type: Number, min: 0, required: true},
-    user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-    movie: {type: Schema.Types.ObjectId, ref: 'Movie', required: true},
+    user: {type: Number, min: 0, required: true},
+    movie: {type: String, required: true},
     rating: {type: Number, min: 0.5, max: 5.0, required: true}
 });
 

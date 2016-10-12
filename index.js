@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var config = require('./config');
 
 var tokenChecker = require('./routes/tokenChecker');
+var errorHandler = require('./routes/errorHandler');
 
 var authorize = require('./routes/authorize');
 var users = require('./routes/users');
@@ -43,5 +44,7 @@ app.use('/api/authorize', authorize);
 app.use('/api/users', users);
 app.use('/api/movies', movies);
 app.use('/api/ratings', ratings);
+
+app.use(errorHandler);
 
 app.listen(config.port, null); //Start listening

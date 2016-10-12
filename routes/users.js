@@ -4,10 +4,9 @@
 var Express = require('express');
 
 /**
- * Properties
+ * Models
  */
 var User = require('../models/user'); //User model
-var Rating = require('../models/rating'); //User model
 
 /**
  * Configure the router
@@ -20,77 +19,94 @@ var router = Express.Router();
  * If query is specified then this will yield a list of users
  * that correspond to the search criteria.
  */
-router.get('/', function (request, response) {
+function getUsers(request, response, next) {
     var userId = request.query['userId'];
     var firstName = request.query['firstName'];
     var middleName = request.query['middleName'];
     var lastName = request.query['lastName'];
     var username = request.query['username'];
 
-    User.search(userId, firstName, middleName, lastName, username, function (error, users) {
-        if (error) {
-            response.status(500).json(error);
-        }
-        response.json(users); //This gives http status 200 by default
-    });
-});
+    User.query(userId, firstName, middleName, lastName, username)
+
+        .then(function (users) { //Get users
+            response.json(users);
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
 
 /**
  * Returns a user specified by the userId.
  */
-router.get('/:userId', function (request, response) {
+function getUserById(request, response, next) {
     var userId = request.params['userId'];
 
-    User.findById(userId, function (error, user) {
-        if (error) {
-            response.status(500).json(error);
-            return;
-        }
-        response.json(user);
-    });
-});
+    User.findById(userId)
+
+        .then(function (user) { //Get user
+            if (!user) {
+                response.sendStatus(404);
+            } else {
+                response.json(user);
+            }
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
 
 /**
  * Adds a user to the database.
  * This will return the id of the user after successfully been added.
  */
-router.post('/', function (request, response) {
+function postUser(request, response, next) {
     var firstName = request.body.firstName;
     var middleName = request.body.middleName;
     var lastName = request.body.lastName;
     var username = request.body.username;
     var password = request.body.password;
 
-    //Find the last user
-    User.findLast(function (error, user) {
-        if (error)
-            throw error;
-        //Get new user id for the new user based on the last id
-        var newId = user ? user._userId + 1 : 0;
+    User.findLast()
 
-        //Create new user using user properties and new userId
-        user = new User();
-        user._userId = newId;
-        user.firstName = firstName;
-        user.middleName = middleName;
-        user.lastName = lastName;
-        user.username = username;
-        user.password = password;
+        .then(function (user) { //Get last user
+            //Get new user id for the new user based on the last id
+            var newId = user ? user._userId + 1 : 0;
 
-        //Validate user properties
-        var error = user.validateSync();
-        if (error) {
-            response.status(400).json(error);
-        } else {
-            //Attempt to save the new user
-            user.save(function (error) {
-                if (error)
-                    throw error;
-                response.sendStatus(201);
-            });
-        }
-    });
-});
+            //Create new user using user properties and new userId
+            user = new User();
+            user._userId = newId;
+            user.firstName = firstName;
+            user.middleName = middleName;
+            user.lastName = lastName;
+            user.username = username;
+            user.password = password;
+
+            //Check for validation errors
+            var error = user.validateSync();
+            if (error) {
+                error.status = 400;
+                next(error);
+            } else {
+                return user.save();
+            }
+        })
+
+        .then(function (user) { //Handle the saving of user
+            user = user.select('-password');
+            response.status(201).json({message: 'Created', user: user});
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
+
+router.get('/', getUsers);
+router.get('/:userId', getUserById);
+router.post('/', postUser);
 
 router.delete('/', function (request, response) {
     response.sendStatus(403);
