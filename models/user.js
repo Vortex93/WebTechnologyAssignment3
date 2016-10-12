@@ -18,13 +18,7 @@ var UserSchema = new Schema({
 });
 
 /**
- * Search the database for users based on the
- * search criteria.
- *
- * @param firstName First name of the user.
- * @param middleName Maiden name of the user.
- * @param lastName Last name of the user.
- * @param username Name that is used to authenticate the user.
+ * Search users in the database.
  */
 UserSchema.statics.query = function (userId, firstName, middleName, lastName, username, callback) {
     var query = {};
@@ -40,9 +34,7 @@ UserSchema.statics.query = function (userId, firstName, middleName, lastName, us
 };
 
 /**
- * Find the user given by the userId.
- * @param userId Unique identifier of the user.
- * @param callback The callback function to be called after the execution.
+ * Find a user based on the user id.
  */
 UserSchema.statics.findById = function (userId, callback) {
     return this.findOne({_userId: userId}, visibleFields)
@@ -50,13 +42,11 @@ UserSchema.statics.findById = function (userId, callback) {
 };
 
 /**
- * Find user based on the username given.
- *
- * @param username Username of the user.
+ * Finds a user based on the username.
  */
-UserSchema.statics.findByUsername = function (username) {
+UserSchema.statics.findByUsername = function (username, callback) {
     return this.findOne({username: username})
-        .exec();
+        .exec(callback);
 };
 
 /**
