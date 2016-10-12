@@ -14,10 +14,10 @@ var User = require('../models/user'); //User model
 var router = Express.Router();
 
 /**
- * Returns a list of users that are registered on the database.
+ * Get a list of users based on query.
  *
- * If query is specified then this will yield a list of users
- * that correspond to the search criteria.
+ * If the queries are not specified, this will returns a
+ * list of all users currently in database.
  */
 function getUsers(request, response, next) {
     var userId = request.query['userId'];
@@ -60,7 +60,6 @@ function getUserById(request, response, next) {
 
 /**
  * Adds a user to the database.
- * This will return the id of the user after successfully been added.
  */
 function postUser(request, response, next) {
     var firstName = request.body.firstName;
@@ -104,12 +103,11 @@ function postUser(request, response, next) {
         });
 }
 
+/**
+ * Router methods
+ */
 router.get('/', getUsers);
 router.get('/:userId', getUserById);
 router.post('/', postUser);
-
-router.delete('/', function (request, response) {
-    response.sendStatus(403);
-});
 
 module.exports = router;

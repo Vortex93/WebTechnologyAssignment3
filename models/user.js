@@ -61,12 +61,10 @@ UserSchema.statics.findByUsername = function (username) {
 
 /**
  * Find the last user that has registered.
- * @param callback The callback function to be called after the execution.
  */
-UserSchema.statics.findLast = function (callback) {
-    return this.findOne().sort( //Get all users and sort them
-        {_userId: -1}) //Sort list according to userId Ascending
-        .exec(callback); //Calls the callback
+UserSchema.statics.findLast = function () {
+    return this.findOne()
+        .sort({_userId: -1}); //Sort descending (Highest number first)
 };
 
 /**
