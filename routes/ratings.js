@@ -16,223 +16,246 @@ var Rating = require('../models/rating');
 var router = Express.Router();
 
 /**
- * Get ratings from the currently logged in user.
+ * Get all the ratings based on the username.
  */
-router.get('/', function (request, response) {
+function getRatings(request, response, next) {
     var username = request.token.username;
     var tt = request.query['tt'];
     var rating = request.query['rating'];
 
-    Rating.find({rating: {movie: tt}})
-        .exec()
+    Rating.findByTt(tt)
+        .then(function (ratings) { //Get all the ratings
+            //Filter the ratings based on the username
+            this.ratings = ratings.filter(function (rating) {
+                return rating.user.username == username;
+            });
 
-        //Get all the ratings
-        .then(function (ratings) {
-            this.ratings = ratings;
-            return User.findByUsername(username);
+            //Respond with the ratings to the user
+            response.json(this.ratings);
         })
 
-        //Get user
-        .then(function (user) {
-            if (user) {
-                this.user = user;
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
+
+/**
+ * Get a rating based on the id of the rating.
+ */
+function getRatingById(request, response, next) {
+    var username = request.token.username;
+    var ratingId = request.params['ratingId'];
+
+
+    User.findByUsername({username: username})
+
+        .then(function (user) { //Handle user
+            if (!user) {
+                response.sendStatus(401); //User not found
             } else {
-                throw new Error
+                //Query for rating with rating id and user id
+                return Rating.find({user: user._id, _ratingId: ratingId});
             }
         })
 
-        .catch();
-});
+        .then(function (rating) { //Handle rating
+            if (!rating) {
+                response.sendStatus(404); //Rating not found
+            } else {
+                response.json(rating); //Respond with rating
+            }
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
 
 /**
- * Get a rating specified by the id.
+ * Create a rating
  */
-router.get('/:ratingId', getRatingById);
-
-/**
- * Add new rating.
- */
-router.post('/', function (request, response) {
+function postRating(request, response, next) {
     var username = request.token.username;
     var tt = request.body.tt;
     var ratingValue = request.body.rating;
 
-    var query = Rating.findByUsername(username);
-    query.then(function (ratings) {
-        this.ratings = ratings;
-        return Movie.findByTt(tt);
-    }).then(function (movie) {
-        if (!movie)
-            throw new Error('Movie not found');
-        this.movie = movie;
-        return User.findByUsername(username);
-    }).then(function (user) {
-        if (!user)
-            throw new Error('User not found');
+    Rating.findByTt(tt)
 
-        this.user = user;
-        if (this.ratings.length > 0) {
-            for (var i = 0; i < this.ratings.length; i++) {
-                var rating = this.ratings[i];
-                if (rating.userId == user.userId) {
-                    throw new Error('You have already rated this movie');
-                }
+        .then(function (rating) { //Handle rating
+            if (rating) {
+                response.status(400).json({message: 'Already rated'});
+            } else {
+                return User.findByUsername(username);
             }
-        }
-        return Rating.findLast();
-    }).then(function (rating) {
-        this.lastRating = rating;
-        var newId = lastRating ? lastRating._ratingId + 1 : 0;
+        })
 
-        rating = new Rating();
-        rating._ratingId = newId;
-        rating.user = this.user;
-        rating.movie = this.movie;
-        rating.rating = ratingValue;
+        .then(function (user) { //Handle user
+            if (!user) {
+                response.sendStatus(401); //User not found
+            } else {
+                this.user = user;
+                return Movie.findByTt(tt); //Query movie based on tt
+            }
+        })
 
-        var error = rating.validateSync();
-        if (error) {
-            throw new Error(error);
-        } else {
-            rating.save();
-            movie.ratings.push({userId: user.userId, rating: rating.rating});
-            movie.save();
+        .then(function (movie) { //Handle movie
+            if (!movie) {
+                response.status(404).json({message: 'TT specified does not exist'});
+            } else {
+                this.movie = movie;
+                return Rating.findLast();
+            }
+        })
+
+        .then(function (rating) { //Handle last rating
+            //Get new id from the last rating's id
+            var ratingId = rating ? rating._ratingId + 1 : 0;
+
+            //Create a new rating
+            this.rating = new Rating;
+            this.rating._ratingId = ratingId;
+            this.rating.user = this.user._userId;
+            this.rating.movie = this.movie.tt;
+            this.rating.rating = ratingValue;
+
+            //Check validation error
+            var validation = this.rating.validateSync();
+            if (validation) {
+                response.status(400).json(validation);
+            }
+
+            return this.rating.save();
+        })
+
+        .then(function () { //Handle save
+            //Save the rating to movie
+            this.movie.ratings.push({
+                userId: this.user.userId,
+                rating: ratingValue
+            });
+
+            this.movie.save();
+
             response.sendStatus(201);
-        }
-    }).catch(function (error) {
-        response.status(400).json(error.message);
-        throw error;
-    });
-});
+        })
+
+        .catch(function (error) {
+            next(error);
+        });
+}
 
 /**
- * Updates rating.
+ * Update rating given by the id.
  */
-router.put('/:ratingId', function (request, response) {
+function putRating(request, response, next) {
     var username = request.token.username;
     var ratingId = request.params['ratingId'];
     var ratingValue = request.body.rating;
 
-    var query = Rating.findById(ratingId);
-    query.then(function (rating) {
-        if (!rating)
-            throw new Error('Rating not found');
-
-        if (rating.user.username != username) {
-            throw new Error('You are not allowed to modify this rating');
-        }
-
-        rating.rating = ratingValue;
-
-        var error = rating.validateSync();
-        if (error)
-            throw error;
-
-        rating.save();
-        return Movie.findByTt(rating.tt);
-    }).then(function (movie) {
-        var rated = 0;
-        for (var i = 0; i < movie.ratings.length; i++) {
-            var rating = movie.ratings[i];
-            rated += rating.rating;
-        }
-        movie.rating = rated / movie.ratings.length;
-        movie.save();
-        response.sendStatus(200);
-    }).catch(function (error) {
-        response.status(400).json(error.message);
-    });
-});
-
-/**
- * Remove a rating based on the rating id.
- *
- * Authenticated users can remove their own rating, this will also
- * remove it from the movie ratings.
- */
-router.delete('/:ratingId', function (request, response) {
-    var ratingId = request.params['ratingId'];
-
-    var query = Rating.findById(ratingId);
-    query.then(function (rating) {
-        if (!rating)
-            throw new Error('Rating not found');
-
-        this.rating = rating;
-        return Movie.findByTt(rating.movie.tt);
-    }).then(function (movie) {
-        this.rating.remove();
-        for (var i = 0; i < movie.ratings.length; i++) {
-            var rating = movie.ratings[i];
-            if (this.rating._id.toString() == rating.toString()) {
-                movie.ratings.remove(rating);
-                break;
-            }
-        }
-        movie.save();
-        response.sendStatus(200);
-    }).catch(function (error) {
-        response.status(400).json(error.message);
-    });
-});
-
-function getRatings(request, response) {
-    var username = request.token.username;
-    var tt = request.query['tt'];
-    var rating = request.query['rating'];
-
-    Rating.findByUsername(username)
-        .exec()
-
-        //Get all the ratings
-        .then(function (ratings) {
-            this.ratings = ratings;
-        })
-
-        //Filter the rating by movie tt
-        .then(function () {
-            this.ratings = this.ratings.filter(function (rating) {
-                return rating.movie.tt == tt;
-            });
-        })
-
-        //Handle response
-        .then(function () {
-            response.json(this.ratings);
-        })
-
-        //Handle error
-        .catch(function (error) {
-            //TODO handle error
-        })
-}
-
-function getRatingById(request, response) {
-    var username = request.token.username;
-    var ratingId = request.params['ratingId'];
-
     Rating.findById(ratingId)
-        .exec()
 
-        //Get the rating
-        .then(function (rating) {
-            this.rating = rating
+        .then(function (rating) { //Handle rating
+            if (!rating) {
+                response.sendStatus(404); //Rating not found
+            } else {
+                this.rating = rating;
+                return User.findByUsername(username);
+            }
         })
 
-        //Filter the rating
-        .then(function () {
-            if (this.rating.user.username == username)
-                throw new MongooseError("Not found");
+        .then(function (user) { //Handle user
+            if (!user) {
+                response.sendStatus(401); //Not authorized
+            } else {
+                this.user = user;
+                if (this.rating.user == this.user._userId) {
+                    response.sendStatus(401); //Not authorized to change someone else's rating
+                } else {
+                    this.rating.rating = ratingValue;
+
+                    //Validate the update
+                    var validation = this.rating.validateSync();
+                    if (validation) {
+                        response.status(400).json(validation);
+                    }
+
+                    return this.rating.save();
+                }
+            }
         })
 
-        //Handle response
-        .then(function () {
-            response.json(this.rating);
+        .then(function (rating) { //Handle save
+            response.sendStatus(200); //OK
         })
 
-        .catch(function (error) {
-            //TODO handle error
+        .catch(function (error) { //Handle error
+            next(error);
         });
 }
+
+/**
+ * Remove rating given by the id.
+ */
+function deleteRating(request, response, next) {
+    var username = request.token.username;
+    var ratingId = request.params['ratingId'];
+
+    User.findByUsername(username)
+
+        .then(function (user) {
+            if (!user) {
+                response.sendStatus(401); //Not authorized
+            } else {
+                //Query the rating
+                return Rating.findById(ratingId);
+            }
+        })
+
+        .then(function (rating) { //Handle rating
+            if (!rating) {
+                response.sendStatus(404); //Rating not found
+            } else {
+                this.rating = rating;
+                return Movie.findByTt({tt: rating.movie});
+            }
+        })
+
+        .then(function (movie) { //Handle movie
+            if (!movie) {
+                response.sendStatus(404); //Movie not found
+            } else {
+                this.movie = movie;
+                //Go through all the ratings in movie
+                for (var i = 0; i < this.movie.ratings.length; i++) {
+                    var rating = this.movie.ratings[i];
+                    if (rating.userId == this.rating.user) { //Check rating with movie rating
+                        this.movie.ratings.splice(i, 1); //Remove the item from array
+                        break;
+                    }
+                }
+
+                return this.movie.save();
+            }
+        })
+
+        .then(function (movie) { //Handle movie
+            this.rating.remove(); //Remove the main rating
+            response.sendStatus(200);
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        })
+
+}
+
+/**
+ * Router methods
+ */
+router.get('/', getRatings);
+router.get('/:ratingId', getRatingById);
+router.post('/', postRating);
+router.put('/:ratingId', putRating);
+router.delete('/:ratingId', deleteRating);
 
 module.exports = router;

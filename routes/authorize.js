@@ -13,49 +13,41 @@ var privateKey = 'Aruba';
 var router = Express.Router();
 
 /**
- * This yield an error to the user to use the POST method.
+ * Authenticate the user.
  */
-router.get('/', function (request, response) {
-    response.status(400).json('Authorization is not supported through GET method');
-});
-
-/**
- * Authenticates the user to use the api.
- *
- * Requirements:
- * - username has to be defined in the body.
- * - password has to be defined in the body.
- * - password must match the user's password
- * - user has to exist.
- */
-router.post('/', function (request, response) {
+function postAuthorize(request, response, next) {
     var username = request.body.username;
     var password = request.body.password;
 
-    if (!username){
+    if (!username) {
         response.status(400).json('Username is not defined');
         return;
     }
 
-    if (!password){
+    if (!password) {
         response.status(400).json('Password is not defined');
         return;
     }
 
-    var query = User.findByUsername(username);
-    query.then(function (user) {
-        if (!user)
-            throw new Error('User not found');
+    User.findByUsername(username)
 
-        if (user.password == password) {
-            var token = jwt.sign({username: username}, privateKey);
-            response.send(token);
-        } else {
-            throw new Error('Password is incorrect');
-        }
-    }).catch(function (error) {
-        response.status(400).json(error.message);
-    });
-});
+        .then(function (user) {
+            if (!user) {
+                response.status(401).json({message: 'Wrong username or password'});
+            } else {
+                var token = jwt.sign({username: username}, privateKey);
+                response.send({token: token});
+            }
+        })
+
+        .catch(function (error) {
+            next(error);
+        });
+}
+
+/**
+ * Router method
+ */
+router.post('/', postAuthorize);
 
 module.exports = router;

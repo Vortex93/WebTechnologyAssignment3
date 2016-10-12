@@ -74,28 +74,32 @@ function postUser(request, response, next) {
             //Get new user id for the new user based on the last id
             var newId = user ? user._userId + 1 : 0;
 
+            if (user.username == username) {
+                error = new Error('Username already exists');
+                error.status = 400;
+                throw error;
+            }
+
             //Create new user using user properties and new userId
-            user = new User();
-            user._userId = newId;
-            user.firstName = firstName;
-            user.middleName = middleName;
-            user.lastName = lastName;
-            user.username = username;
-            user.password = password;
+            this.user = new User();
+            this.user._userId = newId;
+            this.user.firstName = firstName;
+            this.user.middleName = middleName;
+            this.user.lastName = lastName;
+            this.user.username = username;
+            this.user.password = password;
 
             //Check for validation errors
-            var error = user.validateSync();
-            if (error) {
-                error.status = 400;
-                next(error);
+            var validation = this.user.validateSync();
+            if (validation) {
+                response.status(400).json(validation);
             } else {
-                return user.save();
+                return this.user.save();
             }
         })
 
-        .then(function (user) { //Handle the saving of user
-            user = user.select('-password');
-            response.status(201).json({message: 'Created', user: user});
+        .then(function () { //Handle the saving of user
+            response.status(201).json({message: 'Created'});
         })
 
         .catch(function (error) { //Handle error

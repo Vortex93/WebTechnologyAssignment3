@@ -28,9 +28,10 @@ UserSchema.statics.query = function (userId, firstName, middleName, lastName, us
     if (lastName) query.lastName = new RegExp('^' + lastName, 'i');
     if (username) query.username = new RegExp('^' + username, 'i');
 
-    this.find(query,
+    return this.find(query,
         visibleFields, //Makes sure that list of users has certain visible fields (Excl. password)
-        callback); //Calls the callback
+        callback) //Calls the callback
+        .exec(callback);
 };
 
 /**
@@ -52,9 +53,10 @@ UserSchema.statics.findByUsername = function (username, callback) {
 /**
  * Find the last user that has registered.
  */
-UserSchema.statics.findLast = function () {
+UserSchema.statics.findLast = function (callback) {
     return this.findOne()
-        .sort({_userId: -1}); //Sort descending (Highest number first)
+        .sort({_userId: -1}) //Sort descending (Highest number first)
+        .exec(callback);
 };
 
 /**

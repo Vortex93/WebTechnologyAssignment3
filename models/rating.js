@@ -15,13 +15,8 @@ var RatingSchema = new Schema({
 
 /**
  * Returns a list of ratings based on the specified criteria.
- *
- * @param userId User unique identifier
- * @param movieTt Movie uniquer identifier
- * @param rating Rating for the movie
- * @param callback Callback function to be called when the search finished.
  */
-RatingSchema.statics.search = function (movieTt, ratingValue) {
+RatingSchema.statics.search = function (movieTt, ratingValue, callback) {
 
     //If values below are undefined, assign an empty string
     if (!movieTt) movieTt = '';
@@ -41,38 +36,20 @@ RatingSchema.statics.search = function (movieTt, ratingValue) {
                     ratingRegExp.exec(rating.rating);
             });
             return ratings;
-        });
+        }).then(callback);
 };
 
-RatingSchema.statics.findById = function (ratingId) {
-    return this.findOne({_ratingId: ratingId})
-        .populate({path: 'user movie', select: '-password -ratings'});
-};
-
+/**
+ * Find a movie based on the tt identifier.
+ */
 RatingSchema.statics.findByTt = function (tt, username, callback) {
-    this.find()
-        .populate({path: 'user movie', select: '-password -ratings'})
-        .exec(function (error, ratings) {
-            var filtered = ratings.filter(function (rating) {
-                return rating.user.username == username &&
-                    rating.movie.tt == tt;
-            });
-            callback(error, filtered);
-        });
+    return this.findOne({movie: tt})
+        .exec(callback);
 };
 
-RatingSchema.statics.findByUsername = function (username) {
-    return this.find()
-        .populate('user movie', '-password -ratings')
-        .then(function (ratings) {
-            ratings = ratings.filter(function (rating) {
-                return rating.user.username == username;
-            });
-            return ratings;
-        });
-};
-
-
+/**
+ * Find the most recent movie in the database.
+ */
 RatingSchema.statics.findLast = function (callback) {
     return this.findOne().sort(
         {_ratingId: -1})
@@ -85,14 +62,9 @@ RatingSchema.statics.findLast = function (callback) {
 RatingSchema.pre('save', function (callback) {
     var self = this;
     Rating.findOne({user: self.user, movie: self.movie}, function (error, rating) {
-        if (rating) {
-            callback('rating already exists', rating);
-        } else {
-            callback(null, rating);
-        }
+        callback(error, rating);
     });
 });
-
 
 RatingSchema.path('user').validate(function (user) {
     return user != undefined;

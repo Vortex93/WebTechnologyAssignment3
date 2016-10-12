@@ -15,18 +15,11 @@ var MovieSchema = new Schema({
     ratings: [{
         userId: {type: Number, min: 0},
         rating: {type: Number, min: 0.5, max: 5}
-    }],
+    }]
 });
 
 /**
- * Returns a list of movies that correspond to the specified criteria.
- *
- * @param tt Unique identifier of movies based on IMDB.
- * @param title The title
- * @param date The publication date
- * @param length The length in minutes
- * @param director The director
- * @param description A small description
+ * Search movies in the database.
  */
 MovieSchema.statics.query = function (tt, title, date, length, director, description) {
     var query = {};
@@ -53,9 +46,7 @@ MovieSchema.statics.query = function (tt, title, date, length, director, descrip
 };
 
 /**
- * Returns a movie
- *
- * @param tt Unique identifier of movie based on IMDB.
+ * Find a movie based on the imdb tt identification.
  */
 MovieSchema.statics.findByTt = function (tt) {
     return this.findOne({tt: tt});
