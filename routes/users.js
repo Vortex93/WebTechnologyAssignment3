@@ -43,11 +43,14 @@ function getUsers(request, response, next) {
 function getUserById(request, response, next) {
     var userId = request.params['userId'];
 
+    var error;
     User.findById(userId)
 
         .then(function (user) { //Get user
             if (!user) {
-                response.sendStatus(404);
+                error = new Error('Not authorized');
+                error.status = 401;
+                throw error;
             } else {
                 response.json(user);
             }
@@ -68,6 +71,7 @@ function postUser(request, response, next) {
     var username = request.body.username;
     var password = request.body.password;
 
+    var error;
     User.findLast()
 
         .then(function (user) { //Get last user
@@ -92,7 +96,9 @@ function postUser(request, response, next) {
             //Check for validation errors
             var validation = this.user.validateSync();
             if (validation) {
-                response.status(400).json(validation);
+                error = new Error(validation);
+                error.status = 400;
+                throw error;
             } else {
                 return this.user.save();
             }

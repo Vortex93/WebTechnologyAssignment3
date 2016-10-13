@@ -34,12 +34,12 @@ mongoose.connection.on('connected', function () {
 var app = Express();
 app.set('privateKey', 'Aruba'); //Set the private key, that would be used for jwt
 
-app.use(BodyParser.json()); //Support JSON encoded bodies
 app.use(BodyParser.urlencoded({extended: true})); //Support encoded bodies
+
+app.use(BodyParser.json()); //Support JSON encoded bodies
 
 //Verifies token on all the api
 app.use('/api', tokenChecker);
-
 app.use('/api/authorize', authorize);
 app.use('/api/users', users);
 app.use('/api/movies', movies);

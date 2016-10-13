@@ -29,9 +29,11 @@ router.use(function (request, response, callback) {
                 var username = decoded.username;
                 var query = User.findByUsername(username);
                 query.then(function (user) {
-                    if (!user)
-                        throw new Error('User not found');
-
+                    if (!user) {
+                        error = new Error('Not authorized');
+                        error.status = 401;
+                        throw error;
+                    }
                     request.token = decoded;
                     callback();
                 }).catch(function (error) {

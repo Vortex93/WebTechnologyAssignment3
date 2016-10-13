@@ -43,7 +43,7 @@ RatingSchema.statics.search = function (movieTt, ratingValue, callback) {
  * Find a movie based on the tt identifier.
  */
 RatingSchema.statics.findByTt = function (tt, username, callback) {
-    return this.findOne({movie: tt})
+    return this.find({movie: tt})
         .exec(callback);
 };
 

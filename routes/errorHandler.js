@@ -1,6 +1,8 @@
 var errorHandler = function (error, request, response, next) {
     if (error) {
-        console.error(error.stack);
+        if (!error.status) {
+            console.error(error.stack);
+        }
         response.status(error.status || 500);
         response.json({
             message: error.message
