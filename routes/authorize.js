@@ -19,6 +19,8 @@ function postAuthorize(request, response, next) {
     var username = request.body.username;
     var password = request.body.password;
 
+    console.log(username + " " + password);
+
     if (!username) {
         response.status(400).json('Username is not defined');
         return;
@@ -35,8 +37,12 @@ function postAuthorize(request, response, next) {
             if (!user) {
                 response.status(401).json({message: 'Wrong username or password'});
             } else {
-                var token = jwt.sign({username: username}, privateKey);
-                response.send({token: token});
+                if (user.password == password) {
+                    var token = jwt.sign({username: username}, privateKey);
+                    response.json({token: token});
+                } else {
+                    response.status(400).json({message: "Wrong username or password"});
+                }
             }
         })
 
