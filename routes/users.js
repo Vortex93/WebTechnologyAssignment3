@@ -91,7 +91,7 @@ function postUser(request, response, next) {
         })
 
         .then(function (user) {
-            if (user.username == this.user.username) {
+            if (user) { //If user exists
                 error = new Error('Username already exists');
                 error.status = 409;
                 throw error;

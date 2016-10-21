@@ -78,8 +78,6 @@ $(function () {
                 .addClass('alert-danger')
                 .fadeIn();
 
-            debugger;
-
             if (xhr.status == 409) {
                 //User already exists
                 $('.input-group:has(#username)')
