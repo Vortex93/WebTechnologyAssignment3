@@ -19,8 +19,7 @@ function postAuthorize(request, response, next) {
     var username = request.body.username;
     var password = request.body.password;
 
-    console.log(username + " " + password);
-
+     //Pre-conditions
     if (!username) {
         response.status(400).json('Username is not defined');
         return;
@@ -34,13 +33,13 @@ function postAuthorize(request, response, next) {
     User.findByUsername(username)
 
         .then(function (user) {
-            if (!user) {
-                response.status(401).json({message: 'Wrong username or password'});
-            } else {
-                if (user.password == password) {
+            if (!user) { //User does not exist
+                response.status(401).json({message: 'User does not exists'});
+            } else { //User exists
+                if (user.password == password) { //Password is correct
                     var token = jwt.sign({username: username}, privateKey);
                     response.json({token: token});
-                } else {
+                } else { //Incorrect password
                     response.status(400).json({message: "Wrong username or password"});
                 }
             }
