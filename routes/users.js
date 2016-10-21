@@ -78,12 +78,6 @@ function postUser(request, response, next) {
             //Get new user id for the new user based on the last id
             var newId = user ? user._userId + 1 : 0;
 
-            if (user.username == username) {
-                error = new Error('Username already exists');
-                error.status = 400;
-                throw error;
-            }
-
             //Create new user using user properties and new userId
             this.user = new User();
             this.user._userId = newId;
@@ -93,14 +87,24 @@ function postUser(request, response, next) {
             this.user.username = username;
             this.user.password = password;
 
-            //Check for validation errors
-            var validation = this.user.validateSync();
-            if (validation) {
-                error = new Error(validation);
-                error.status = 400;
+            return User.findByUsername(username);
+        })
+
+        .then(function (user) {
+            if (user.username == this.user.username) {
+                error = new Error('Username already exists');
+                error.status = 409;
                 throw error;
             } else {
-                return this.user.save();
+                //Check for validation errors
+                var validation = this.user.validateSync();
+                if (validation) {
+                    error = new Error(validation);
+                    error.status = 400;
+                    throw error;
+                } else {
+                    return this.user.save();
+                }
             }
         })
 

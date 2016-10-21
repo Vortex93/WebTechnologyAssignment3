@@ -2,7 +2,7 @@
 <project version="4">
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$" libraries="{NotFlix/node_modules}" />
-    <file url="PROJECT" libraries="{node-DefinitelyTyped}" />
+    <file url="PROJECT" libraries="{bootstrap, express-DefinitelyTyped, jquery, jquery-ajax-chain-DefinitelyTyped, mongoose-DefinitelyTyped, node-DefinitelyTyped}" />
     <includedPredefinedLibrary name="ECMAScript 6" />
     <includedPredefinedLibrary name="Node.js Core" />
     <includedPredefinedLibrary name="NotFlix/node_modules" />
