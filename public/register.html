@@ -1,83 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!--Custom CSS-->
     <link rel="stylesheet" href="assets/css/register.css">
-
-    <!--Bootstrap-->
-    <link rel="stylesheet" href="assets/libs/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!--Bootstrap Material Design-->
-    <!--<link rel="stylesheet" type="text/css" href="assets/libs/bootstrap-material-design.min.css">-->
-
-    <!--Ripples-->
-    <link rel="stylesheet" type="text/css" href="assets/libs/ripples.min.css">
-
-    <!--Awesome Font-->
-    <link href="assets/libs/font-awesome.min.css">
-
-    <title>NotFlix</title>
 </head>
 <body>
+<div class="row">
+    <div class="col-sm-4 col-sm-offset-4">
+        <div class="panel panel-default vertical-center">
+            <div class="panel-heading">Register</div>
+            <div class="panel-body">
+                <form id="register_form">
+                    <div class="input-group">
+                        <input id="firstName" type="text" required class="form-control" placeholder="First Name"
+                               aria-describedby="basic-addon1">
+                    </div>
 
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">
-            <!--<img id="logo" src="assets/img" alt="brand">-->
-        </a>
-    </div>
-</nav>
+                    <div class="input-group">
+                        <input id="middleName" type="text" class="form-control" placeholder="Middle Name"
+                               aria-describedby="basic-addon1">
+                    </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-4 col-sm-offset-4">
-            <div class="panel panel-default vertical-center">
-                <div class="panel-heading">Register</div>
-                <div class="panel-body">
-                    <form id="register_form">
-                        <div class="input-group">
-                            <input id="firstName" type="text" class="form-control" placeholder="First Name"
-                                   aria-describedby="basic-addon1">
-                        </div>
+                    <div class="input-group">
+                        <input id="lastName" type="text" required class="form-control" placeholder="Last Name"
+                               aria-describedby="basic-addon1">
+                    </div>
 
-                        <div class="input-group">
-                            <input id="middleName" type="text" class="form-control" placeholder="Middle Name"
-                                   aria-describedby="basic-addon1">
-                        </div>
+                    <div class="input-group">
+                        <input id="username" type="text" required class="form-control" placeholder="Username"
+                               aria-describedby="basic-addon1">
+                    </div>
 
-                        <div class="input-group">
-                            <input id="lastName" type="text" class="form-control" placeholder="Last Name"
-                                   aria-describedby="basic-addon1">
-                        </div>
+                    <div class="input-group">
+                        <input id="password" type="password" required class="form-control" placeholder="Password"
+                               aria-describedby="basic-addon2">
+                    </div>
 
-                        <div class="input-group">
-                            <input id="username" type="text" class="form-control" placeholder="Username"
-                                   aria-describedby="basic-addon1">
-                        </div>
-
-                        <div class="input-group">
-                            <input id="password" type="password" class="form-control" placeholder="Password"
-                                   aria-describedby="basic-addon2">
-                        </div>
-                        <button type="submit" class="btn btn-default">Register</button>
-                        <button id="cancel_button" type="button" class="btn btn-default">Cancel</button>
-
-                        <div class="alert" role="alert" hidden></div>
-                    </form>
-                </div>
+                    <div class="input-group">
+                        <input id="confirmation" type="password" required class="form-control"
+                               placeholder="Confirmation"
+                               aria-describedby="basic-addon2">
+                    </div>
+                    <button type="submit" class="btn btn-default">Register</button>
+                    <div class="alert" role="alert" hidden></div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-<!--jQuery-->
-<script src="assets/libs/jquery-3.1.1.js"></script>
-<!--Bootstrap JS-->
-<script src="assets/libs/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
 
 <script src="assets/js/register.js"></script>
 </body>

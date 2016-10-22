@@ -51,8 +51,38 @@ function postAuthorize(request, response, next) {
 }
 
 /**
+ * Verification for the token
+ */
+function getAuthorize(request, response, next) {
+    var username = request.token.username;
+
+    var error;
+    User.findByUsername(username)
+
+        .then(function (user) {
+            if (user) {
+                response.json({
+                    firstName: user.firstName,
+                    middleName: user.middleName,
+                    lastName: user.lastName,
+                    username: user.username
+                });
+            } else {
+                error = new Error('Invalid Token');
+                error.status = 400;
+                throw error;
+            }
+        })
+
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
+
+/**
  * Router method
  */
 router.post('/', postAuthorize);
+router.get('/', getAuthorize);
 
 module.exports = router;

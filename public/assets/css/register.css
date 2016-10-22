@@ -1,3 +1,6 @@
-.vertical-center {
-    margin-top: 50%;
+@media (min-width: 992px) {
+    .vertical-center {
+        position: relative;
+        top: 25vh;
+    }
 }
