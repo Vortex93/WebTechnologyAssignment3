@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="assets/css/register.css">
+</head>
+<body>
+<div class="row">
+    <div class="col-sm-4 col-sm-offset-4">
+        <div class="panel panel-default vertical-center">
+            <div class="panel-heading">Register</div>
+            <div class="panel-body">
+                <form id="register_form">
+                    <div class="input-group">
+                        <input id="firstName" type="text" required class="form-control" placeholder="First Name"
+                               aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group">
+                        <input id="middleName" type="text" class="form-control" placeholder="Middle Name"
+                               aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group">
+                        <input id="lastName" type="text" required class="form-control" placeholder="Last Name"
+                               aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group">
+                        <input id="username" type="text" required class="form-control" placeholder="Username"
+                               aria-describedby="basic-addon1">
+                    </div>
+
+                    <div class="input-group">
+                        <input id="password" type="password" required class="form-control" placeholder="Password"
+                               aria-describedby="basic-addon2">
+                    </div>
+
+                    <div class="input-group">
+                        <input id="confirmation" type="password" required class="form-control"
+                               placeholder="Confirmation"
+                               aria-describedby="basic-addon2">
+                    </div>
+                    <button type="submit" class="btn btn-default">Register</button>
+                    <div class="alert" role="alert" hidden></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/register.js"></script>
+</body>
+</html>

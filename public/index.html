@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--Custom CSS-->
+    <link rel="stylesheet" href="assets/css/index.css">
+
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="assets/libs/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!--Bootstrap Material Design-->
+    <!--<link rel="stylesheet" type="text/css" href="assets/libs/bootstrap-material-design.min.css">-->
+
+    <!--Ripples-->
+    <link rel="stylesheet" type="text/css" href="assets/libs/ripples.min.css">
+
+    <!--Awesome Font-->
+    <link href="assets/libs/font-awesome.min.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NotFlix</title>
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container-fluid">
+        <!--<a class="navbar-brand" href="index.html">-->
+        <!--<img id="logo" src="assets/img" alt="brand">-->
+        <!--</a>-->
+        <ul class="nav navbar-nav">
+            <li><a id="home_button" href="#Home">Home</a></li>
+            <li><a id="movies_button" href="#Movies">Movies</a></li>
+            <li><a id="users_button" href="#Users">Users</a></li>
+        </ul>
+        <ul class="nav navbar navbar-nav navbar-right">
+            <li id="user" class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                   aria-expanded="false">User <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <!--TODO: Implement the items below or remove them-->
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a id="log_out_button">Log out</a></li>
+                </ul>
+            </li>
+            <li>
+                <button id="register_button" class="btn btn-default navbar-btn">Register</button>
+            </li>
+            <li>
+                <button id="log_in_button" class="btn btn-default navbar-btn">Log In</button>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div id="content" class="container">
+</div>
+
+<!--jQuery-->
+<script src="assets/libs/jquery-3.1.1.min.js"></script>
+<!--Bootstrap JS-->
+<script src="assets/libs/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+<script src="assets/js/index.js"></script>
+</body>
+</html>

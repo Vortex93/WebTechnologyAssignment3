@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Main Page (index.html)
+   ========================================================================== */
+
+/* These objects must be hidden.
+   Only when the use is online, these should be available */
+#user,
+#log_in_button,
+#register_button {
+    display: none;
+}
+
+/* Adds a spacing between buttons on the right side of the navigation bar */
+nav .btn {
+    margin-right: 10px;
+}
+
+/* TODO: Fix*/
+#logo {
+    height: 32px;
+}

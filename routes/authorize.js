@@ -19,6 +19,7 @@ function postAuthorize(request, response, next) {
     var username = request.body.username;
     var password = request.body.password;
 
+    //Pre-conditions
     if (!username) {
         response.status(400).json('Username is not defined');
         return;
@@ -31,16 +32,49 @@ function postAuthorize(request, response, next) {
 
     User.findByUsername(username)
 
-        .then(function (user) {
-            if (!user) {
-                response.status(401).json({message: 'Wrong username or password'});
-            } else {
-                var token = jwt.sign({username: username}, privateKey);
-                response.send({token: token});
+        .then(function (user) { //Handle user retrieval
+            if (!user) { //User does not exist
+                response.status(404).json({message: 'User does not exists'});
+            } else { //User exists
+                if (user.password == password) { //Password is correct
+                    var token = jwt.sign({username: username}, privateKey);
+                    response.json({token: token});
+                } else { //Incorrect password
+                    response.status(403).json({message: "Password incorrect"});
+                }
             }
         })
 
-        .catch(function (error) {
+        .catch(function (error) { //Handle error
+            next(error);
+        });
+}
+
+/**
+ * Verification for the token
+ */
+function getAuthorize(request, response, next) {
+    var username = request.token.username;
+
+    var error;
+    User.findByUsername(username)
+
+        .then(function (user) {
+            if (user) {
+                response.json({
+                    firstName: user.firstName,
+                    middleName: user.middleName,
+                    lastName: user.lastName,
+                    username: user.username
+                });
+            } else {
+                error = new Error('Invalid Token');
+                error.status = 400;
+                throw error;
+            }
+        })
+
+        .catch(function (error) { //Handle error
             next(error);
         });
 }
@@ -49,5 +83,6 @@ function postAuthorize(request, response, next) {
  * Router method
  */
 router.post('/', postAuthorize);
+router.get('/', getAuthorize);
 
 module.exports = router;

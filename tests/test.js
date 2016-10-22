@@ -6,7 +6,6 @@ var assert = require('assert');
 var supertest = require('supertest');
 var jwt = require('jsonwebtoken');
 
-
 /**
  * Connect to mongoose server
  */
