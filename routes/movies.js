@@ -16,7 +16,7 @@ var router = express.Router();
  * If query is specified then this will yield a list of movies
  * that correspond to the search criteria.
  */
-router.get('/', function (request, response, next) {
+function getMovies(request, response, next) {
     var tt = request.query['tt'];
     var title = request.query['title'];
     var date = request.query['publicationDate'];
@@ -33,6 +33,7 @@ router.get('/', function (request, response, next) {
         .catch(function (error) { //Handle error
             next(error);
         });
-});
+}
+router.get('/', getMovies);
 
 module.exports = router;
