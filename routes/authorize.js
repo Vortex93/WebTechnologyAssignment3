@@ -62,10 +62,11 @@ function getAuthorize(request, response, next) {
         .then(function (user) {
             if (user) {
                 response.json({
+                    _userId: user._userId,
+                    username: user.username,
                     firstName: user.firstName,
                     middleName: user.middleName,
-                    lastName: user.lastName,
-                    username: user.username
+                    lastName: user.lastName
                 });
             } else {
                 error = new Error('Invalid Token');

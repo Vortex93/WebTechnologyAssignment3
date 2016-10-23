@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="assets/libs/star-rating.min.css">
+</head>
+<body>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 panel panel-default">
+        <div class="row">
+            <div class="col-md-2">
+                <br>
+                <a id="back_button" class="btn" href="#">< Back</a>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="username"></h3>
+                <img id="movie_poster" class="thumbnail">
+            </div>
+            <div class="col-md-5">
+                <div class="row">
+                    <table id="properties_table" class="table">
+                        <tbody>
+                        <tr>
+                            <td id="tt"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Title</b></td>
+                            <td id="title"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Date</b></td>
+                            <td id="date"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Length</b></td>
+                            <td id="length"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Director</b></td>
+                            <td id="director"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Description</b></td>
+                            <td id="description"></td>
+                        </tr>
+                        <tr>
+                            <td><b>Rating</b></td>
+                            <td>
+                                <input id="movie_rating_value" class="rating-container rating rating-animate"
+                                       data-size="xs" type="number" min="0.5"
+                                       max="5" step="0.1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Your Rating</b></td>
+                            <td>
+                                <input id="user_rating_value" class="rating rating-animate" data-size="xs" type="number"
+                                       min="0.5"
+                                       max="5" value="0.5" step="0.1">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="assets/js/movie.js"></script>
+<script src="assets/libs/star-rating.min.js"></script>
+</body>
+</html>

@@ -226,9 +226,13 @@ function putRating(request, response, next) {
 
                 if (rating.userId == this.user._userId) {
                     rating.rating = ratingValue;
-                    movie.save();
+                    return movie.save();
                 }
             }
+        })
+
+        .then(function () { //Handle save
+            response.sendStatus(200);
         })
 
         .catch(function (error) { //Handle error

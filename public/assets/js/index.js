@@ -41,7 +41,7 @@ $(function () {
      */
     function loadPage(url) {
         if (url) {
-            $('#content').fadeOut(100, function () {
+            $('#content').fadeOut(50, function () {
                 $('#content')
                     .load(url, null, function () {
                         setTimeout(function () {
@@ -74,6 +74,7 @@ $(function () {
             url: '/api/authorize'
         }).done(function (data) { //Valid token
             showAuthorizedButtons();
+            window.localStorage.setItem('user', JSON.stringify(data)); //Set user properties in local storage
             $('#user')
                 .children('a')
                 .html(data.lastName + ", " + data.firstName);

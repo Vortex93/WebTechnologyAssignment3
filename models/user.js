@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var ObjectId = mongoose.Types.ObjectId;
 
-const visibleFields = 'firstName middleName lastName username';
+const visibleFields = '_userId firstName middleName lastName username';
 
 //Create the user schema
 var UserSchema = new Schema({
@@ -69,7 +69,6 @@ UserSchema.pre('save', function (callback) {
         callback(error, user);
     });
 });
-
 UserSchema.path('firstName').validate(function (firstName) {
     return firstName.length > 0;
 }, 'First name can not be empty');
