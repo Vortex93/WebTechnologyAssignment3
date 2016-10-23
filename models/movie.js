@@ -37,6 +37,7 @@ MovieSchema.statics.query = function (tt, title, date, length, director, descrip
             tt: 1,
             title: 1,
             date: 1,
+            length: 1,
             director: 1,
             description: 1,
             rating: {
