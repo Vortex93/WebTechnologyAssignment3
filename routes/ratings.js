@@ -148,8 +148,8 @@ function postRating(request, response, next) {
         })
 
         .then(function (movie) {
-                this.movie.ratings.push({userId: this.user._userId, rating: this.rating.rating});
-                return this.movie.save();
+            this.movie.ratings.push({userId: this.user._userId, rating: this.rating.rating});
+            return this.movie.save();
         })
 
         .then(function () {
@@ -190,7 +190,7 @@ function putRating(request, response, next) {
                 throw error;
             } else {
                 this.user = user;
-                if (this.rating.user == this.user._userId) {
+                if (this.rating.user != this.user._userId) {
                     error = new Error('Not authorized');
                     error.status = 401;
                     throw error;
@@ -211,7 +211,24 @@ function putRating(request, response, next) {
         })
 
         .then(function (rating) { //Handle save
-            response.sendStatus(200); //OK
+            if (rating instanceof Error) {
+                error = rating;
+                throw error;
+            } else {
+                return Movie.findByTt(this.rating.movie);
+            }
+        })
+
+        .then(function (movie) {
+            this.movie = movie;
+            for (var i = 0; i < movie.ratings.length; i++) {
+                var rating = movie.ratings[i];
+
+                if (rating.userId == this.user._userId) {
+                    rating.rating = ratingValue;
+                    movie.save();
+                }
+            }
         })
 
         .catch(function (error) { //Handle error
@@ -283,10 +300,10 @@ function deleteRating(request, response, next) {
 /**
  * Router methods
  */
-router.get('/', getRatings);
-router.get('/:ratingId', getRatingById);
-router.post('/', postRating);
-router.put('/:ratingId', putRating);
-router.delete('/:ratingId', deleteRating);
+router.get('/', getRatings); //Get user ratings
+router.get('/:ratingId', getRatingById); //Get specific rating
+router.post('/', postRating); //Create
+router.put('/:ratingId', putRating); //Update
+router.delete('/:ratingId', deleteRating); //Delete
 
 module.exports = router;
